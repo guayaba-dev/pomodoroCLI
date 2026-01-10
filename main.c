@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 
@@ -13,6 +14,14 @@ void sleep_ms(int ms) {
 #endif
 }
 
+// Data structures
+enum pomodoroSessions { s_work, s_break, s_longbreak };
+
+struct pomodoroSession {
+  enum pomodoroSessions session;
+  enum pomodoroSessions nextSession;
+} typedef p_session;
+
 struct timer {
   float waitTimeSeconds;
   float timeLeft;
@@ -20,35 +29,63 @@ struct timer {
   time_t initTime;
 } typedef t_timer;
 
+// Global values
 _Bool EXIT = 0;
+p_session p_sessions[3] = {
+    {s_work, s_break}, {s_break, s_longbreak}, {s_longbreak, s_work}};
+enum pomodoroSessions currentSession = s_work;
+
 t_timer *currentTimer;
+t_timer *timers[3];
 
 void setCurrentTimer(t_timer *timer) { currentTimer = timer; }
 
 void *createTimer(float waitTimeSeconds) {
   t_timer *timer = (struct timer *)malloc(sizeof(struct timer));
   timer->waitTimeSeconds = waitTimeSeconds;
-  timer->timeLeft = 0.0;
+  timer->timeLeft = waitTimeSeconds;
   timer->paused = 0;
-  timer->initTime = time(NULL);
   return timer;
 }
 
-void setTimer(t_timer *timer) { currentTimer = timer; }
+void setTimer(t_timer *timer) {
+  currentTimer = timer;
+  currentTimer->initTime = time(NULL);
+}
+
+void pauseTimer(t_timer *timer) {
+  timer->paused = 1;
+  timer->timeLeft =
+      timer->waitTimeSeconds - difftime(time(NULL), timer->initTime);
+}
+
+void nextSession() {
+  currentSession = p_sessions[currentSession].nextSession;
+  setTimer(timers[currentSession]);
+};
 
 void countTimer() {
 
+  if (currentTimer->paused)
+    return;
+
   time_t now = time(NULL);
-  if (difftime(now, currentTimer->initTime) < currentTimer->waitTimeSeconds) {
+  if (difftime(now, currentTimer->initTime) < currentTimer->timeLeft) {
+    printf("currentSession: %d\n", currentSession);
+    printf("currentSession: %f\n", currentTimer->waitTimeSeconds -
+                                       difftime(now, currentTimer->initTime));
     return;
   }
 
-  EXIT = 1;
+  nextSession();
 };
 
 int main(int argc, char *argv[]) {
-  t_timer *fiveSecTimer = createTimer(5.);
-  setTimer(fiveSecTimer);
+  timers[s_work] = createTimer(25);
+  timers[s_break] = createTimer(5);
+  timers[s_longbreak] = createTimer(15);
+
+  setTimer(timers[s_work]);
 
   while (!EXIT) {
     countTimer();
