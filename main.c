@@ -15,12 +15,13 @@ void sleep_ms(int ms) {
 }
 
 // Data structures
-enum pomodoroSessions { s_work, s_break, s_longbreak };
+enum pomodoroStates { s_work, s_break, s_longbreak };
 
-struct pomodoroSession {
-  enum pomodoroSessions session;
-  enum pomodoroSessions nextSession;
-} typedef p_session;
+struct pomodoroState {
+  enum pomodoroStates state;
+  enum pomodoroStates nextState;
+  _Bool countsAsWorkSession;
+} typedef p_state;
 
 struct timer {
   float waitTimeSeconds;
@@ -31,9 +32,10 @@ struct timer {
 
 // Global values
 _Bool EXIT = 0;
-p_session p_sessions[3] = {
-    {s_work, s_break}, {s_break, s_longbreak}, {s_longbreak, s_work}};
-enum pomodoroSessions currentSession = s_work;
+p_state p_states[3] = {
+    {s_work, s_break, 1}, {s_break, s_work}, {s_longbreak, s_work}};
+enum pomodoroStates currentState = s_work;
+int sessionNumber = 0;
 
 t_timer *currentTimer;
 t_timer *timers[3];
@@ -60,8 +62,15 @@ void pauseTimer(t_timer *timer) {
 }
 
 void nextSession() {
-  currentSession = p_sessions[currentSession].nextSession;
-  setTimer(timers[currentSession]);
+  if (p_states[currentState].countsAsWorkSession)
+    sessionNumber++;
+
+  if (sessionNumber % 4 == 0 && sessionNumber != 0)
+    currentState = s_longbreak;
+  else
+    currentState = p_states[currentState].nextState;
+
+  setTimer(timers[currentState]);
 };
 
 void countTimer() {
@@ -71,7 +80,7 @@ void countTimer() {
 
   time_t now = time(NULL);
   if (difftime(now, currentTimer->initTime) < currentTimer->timeLeft) {
-    printf("currentSession: %d\n", currentSession);
+    printf("currentSession: %d\n", currentState);
     printf("currentSession: %f\n", currentTimer->waitTimeSeconds -
                                        difftime(now, currentTimer->initTime));
     return;
@@ -81,8 +90,8 @@ void countTimer() {
 };
 
 int main(int argc, char *argv[]) {
-  timers[s_work] = createTimer(25);
-  timers[s_break] = createTimer(5);
+  timers[s_work] = createTimer(3);
+  timers[s_break] = createTimer(2);
   timers[s_longbreak] = createTimer(15);
 
   setTimer(timers[s_work]);
