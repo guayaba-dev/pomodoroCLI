@@ -1,3 +1,4 @@
+#include <curses.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -49,13 +50,17 @@ void *createTimer(float waitTimeSeconds) {
   timer->paused = 0;
   return timer;
 }
-
 void setTimer(t_timer *timer) {
   currentTimer = timer;
   currentTimer->initTime = time(NULL);
 }
 
-void pauseTimer(t_timer *timer) {
+void togglePauseTimer(t_timer *timer) {
+  if (timer->paused == 1) {
+    timer->paused = 0;
+    timer->initTime = time(NULL);
+  }
+
   timer->paused = 1;
   timer->timeLeft =
       timer->waitTimeSeconds - difftime(time(NULL), timer->initTime);
@@ -74,22 +79,41 @@ void nextSession() {
 };
 
 void countTimer() {
+  time_t now = time(NULL);
+  printw("currentSession: %d\n", currentState);
+  printw("currentSession: %f\n",
+         currentTimer->timeLeft - difftime(now, currentTimer->initTime));
 
   if (currentTimer->paused)
     return;
 
-  time_t now = time(NULL);
   if (difftime(now, currentTimer->initTime) < currentTimer->timeLeft) {
-    printf("currentSession: %d\n", currentState);
-    printf("currentSession: %f\n", currentTimer->waitTimeSeconds -
-                                       difftime(now, currentTimer->initTime));
     return;
   }
 
   nextSession();
 };
 
+void getInput() {
+
+  int tecla = getch();
+
+  if (tecla == ERR)
+    return;
+
+  if (tecla == 27)
+    EXIT = 1;
+
+  if (tecla == 112 || tecla == 80)
+    togglePauseTimer(currentTimer);
+};
+
 int main(int argc, char *argv[]) {
+  initscr();
+  cbreak();
+  noecho();
+  nodelay(stdscr, true);
+
   timers[s_work] = createTimer(3);
   timers[s_break] = createTimer(2);
   timers[s_longbreak] = createTimer(15);
@@ -97,7 +121,10 @@ int main(int argc, char *argv[]) {
   setTimer(timers[s_work]);
 
   while (!EXIT) {
+    getInput();
     countTimer();
+    refresh();
+    clear();
     sleep_ms(5);
   }
 
