@@ -1,5 +1,4 @@
 #include <curses.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 
@@ -14,6 +13,146 @@ void sleep_ms(int ms) {
   usleep(ms * 1000);
 #endif
 }
+
+const char *ZERO = {
+
+    "##########\n"
+    "##      ##\n"
+    "##      ##\n"
+    "##      ##\n"
+    "##      ##\n"
+    "##      ##\n"
+    "##      ##\n"
+    "##      ##\n"
+    "##########\n"
+
+};
+
+const char *ONE = {
+
+    "        ##\n"
+    "        ##\n"
+    "        ##\n"
+    "        ##\n"
+    "        ##\n"
+    "        ##\n"
+    "        ##\n"
+    "        ##\n"
+    "        ##\n"
+
+};
+
+const char *TWO = {
+
+    "##########\n"
+    "        ##\n"
+    "        ##\n"
+    "        ##\n"
+    "##########\n"
+    "##        \n"
+    "##        \n"
+    "##        \n"
+    "##########\n"
+
+};
+
+const char *THREE = {
+
+    "##########\n"
+    "        ##\n"
+    "        ##\n"
+    "        ##\n"
+    "##########\n"
+    "        ##\n"
+    "        ##\n"
+    "        ##\n"
+    "##########\n"
+
+};
+
+const char *FOUR = {
+
+    "##      ##\n"
+    "##      ##\n"
+    "##      ##\n"
+    "##      ##\n"
+    "##########\n"
+    "        ##\n"
+    "        ##\n"
+    "        ##\n"
+    "        ##\n"
+
+};
+
+const char *FIVE = {
+
+    "##########\n"
+    "##        \n"
+    "##        \n"
+    "##        \n"
+    "##########\n"
+    "        ##\n"
+    "        ##\n"
+    "        ##\n"
+    "##########\n"
+
+};
+
+const char *SIX = {
+
+    "##########\n"
+    "##        \n"
+    "##        \n"
+    "##        \n"
+    "##########\n"
+    "##      ##\n"
+    "##      ##\n"
+    "##      ##\n"
+    "##########\n"
+
+};
+
+const char *SEVEN = {
+
+    "##########\n"
+    "        ##\n"
+    "        ##\n"
+    "        ##\n"
+    "        ##\n"
+    "        ##\n"
+    "        ##\n"
+    "        ##\n"
+    "        ##\n"
+
+};
+
+const char *eight = {
+
+    "##########\n"
+    "##      ##\n"
+    "##      ##\n"
+    "##      ##\n"
+    "##########\n"
+    "##      ##\n"
+    "##      ##\n"
+    "##      ##\n"
+    "##########\n"
+
+};
+
+const char *nine = {
+
+    "##########\n"
+    "##      ##\n"
+    "##      ##\n"
+    "##      ##\n"
+    "##########\n"
+    "        ##\n"
+    "        ##\n"
+    "        ##\n"
+    "##########\n"
+
+};
 
 // Data structures
 enum pomodoroStates { s_work, s_break, s_longbreak };
@@ -59,6 +198,7 @@ void togglePauseTimer(t_timer *timer) {
   if (timer->paused == 1) {
     timer->paused = 0;
     timer->initTime = time(NULL);
+    return;
   }
 
   timer->paused = 1;
@@ -67,6 +207,7 @@ void togglePauseTimer(t_timer *timer) {
 }
 
 void nextSession() {
+  flash();
   if (p_states[currentState].countsAsWorkSession)
     sessionNumber++;
 
@@ -80,6 +221,9 @@ void nextSession() {
 
 void countTimer() {
   time_t now = time(NULL);
+  printw("%d\n", COLS);
+  printw("%d\n", LINES);
+  move(LINES * .5, COLS * .5);
   printw("currentSession: %d\n", currentState);
   printw("currentSession: %f\n",
          currentTimer->timeLeft - difftime(now, currentTimer->initTime));
@@ -108,6 +252,8 @@ void getInput() {
     togglePauseTimer(currentTimer);
 };
 
+void drawCLI() {};
+
 int main(int argc, char *argv[]) {
   initscr();
   cbreak();
@@ -123,6 +269,7 @@ int main(int argc, char *argv[]) {
   while (!EXIT) {
     getInput();
     countTimer();
+    drawCLI();
     refresh();
     clear();
     sleep_ms(5);
