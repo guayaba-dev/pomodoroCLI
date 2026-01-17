@@ -275,5 +275,7 @@ int main(int argc, char *argv[]) {
     sleep_ms(5);
   }
 
+  endwin();
+
   return 0;
 }
