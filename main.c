@@ -195,6 +195,7 @@ void *createTimer(float waitTimeSeconds) {
 void setTimer(t_timer *timer) {
   currentTimer = timer;
   currentTimer->initTime = time(NULL);
+  currentTimer->timeLeft = currentTimer->waitTimeSeconds;
 }
 
 void togglePauseTimer(t_timer *timer) {
@@ -303,9 +304,9 @@ int main(int argc, char *argv[]) {
   noecho();
   nodelay(stdscr, true);
 
-  timers[s_work] = createTimer(10 * 60);
-  timers[s_break] = createTimer(2 * 60);
-  timers[s_longbreak] = createTimer(1 * 60);
+  timers[s_work] = createTimer(10);
+  timers[s_break] = createTimer(2);
+  timers[s_longbreak] = createTimer(1);
 
   setTimer(timers[s_work]);
 
