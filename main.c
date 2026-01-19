@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <time.h>
 
+#define NUMS_LINES 9
+
 // Versión correcta
 void sleep_ms(int ms) {
 #ifdef _WIN32
@@ -14,125 +16,139 @@ void sleep_ms(int ms) {
 #endif
 }
 
-const char *NUMS[] = {
+const char *NUMS[10][NUMS_LINES] = {
 
-    "##########\n"
-    "##      ##\n"
-    "##      ##\n"
-    "##      ##\n"
-    "##      ##\n"
-    "##      ##\n"
-    "##      ##\n"
-    "##      ##\n"
+    "##########\0",
+    "##      ##\0",
+    "##      ##\0",
+    "##      ##\0",
+    "##      ##\0",
+    "##      ##\0",
+    "##      ##\0",
+    "##      ##\0",
     "##########\0"
 
     ,
 
-    "        ##\n"
-    "        ##\n"
-    "        ##\n"
-    "        ##\n"
-    "        ##\n"
-    "        ##\n"
-    "        ##\n"
-    "        ##\n"
+    "        ##\0",
+    "        ##\0",
+    "        ##\0",
+    "        ##\0",
+    "        ##\0",
+    "        ##\0",
+    "        ##\0",
+    "        ##\0",
     "        ##\0"
 
     ,
 
-    "##########\n"
-    "        ##\n"
-    "        ##\n"
-    "        ##\n"
-    "##########\n"
-    "##        \n"
-    "##        \n"
-    "##        \n"
+    "##########\0",
+    "        ##\0",
+    "        ##\0",
+    "        ##\0",
+    "##########\0",
+    "##        \0",
+    "##        \0",
+    "##        \0",
     "##########\0"
 
     ,
 
-    "##########\n"
-    "        ##\n"
-    "        ##\n"
-    "        ##\n"
-    "##########\n"
-    "        ##\n"
-    "        ##\n"
-    "        ##\n"
+    "##########\0",
+    "        ##\0",
+    "        ##\0",
+    "        ##\0",
+    "##########\0",
+    "        ##\0",
+    "        ##\0",
+    "        ##\0",
     "##########\0"
 
     ,
 
-    "##      ##\n"
-    "##      ##\n"
-    "##      ##\n"
-    "##      ##\n"
-    "##########\n"
-    "        ##\n"
-    "        ##\n"
-    "        ##\n"
+    "##      ##\0",
+    "##      ##\0",
+    "##      ##\0",
+    "##      ##\0",
+    "##########\0",
+    "        ##\0",
+    "        ##\0",
+    "        ##\0",
     "        ##\0"
 
     ,
 
-    "##########\n"
-    "##        \n"
-    "##        \n"
-    "##        \n"
-    "##########\n"
-    "        ##\n"
-    "        ##\n"
-    "        ##\n"
+    "##########\0",
+    "##        \0",
+    "##        \0",
+    "##        \0",
+    "##########\0",
+    "        ##\0",
+    "        ##\0",
+    "        ##\0",
     "##########\0"
 
     ,
 
-    "##########\n"
-    "##        \n"
-    "##        \n"
-    "##        \n"
-    "##########\n"
-    "##      ##\n"
-    "##      ##\n"
-    "##      ##\n"
+    "##########\0",
+    "##        \0",
+    "##        \0",
+    "##        \0",
+    "##########\0",
+    "##      ##\0",
+    "##      ##\0",
+    "##      ##\0",
     "##########\0"
 
     ,
 
-    "##########\n"
-    "        ##\n"
-    "        ##\n"
-    "        ##\n"
-    "        ##\n"
-    "        ##\n"
-    "        ##\n"
-    "        ##\n"
+    "##########\0",
+    "        ##\0",
+    "        ##\0",
+    "        ##\0",
+    "        ##\0",
+    "        ##\0",
+    "        ##\0",
+    "        ##\0",
     "        ##\0"
 
     ,
 
-    "##########\n"
-    "##      ##\n"
-    "##      ##\n"
-    "##      ##\n"
-    "##########\n"
-    "##      ##\n"
-    "##      ##\n"
-    "##      ##\n"
+    "##########\0",
+    "##      ##\0",
+    "##      ##\0",
+    "##      ##\0",
+    "##########\0",
+    "##      ##\0",
+    "##      ##\0",
+    "##      ##\0",
     "##########\0"
 
     ,
 
-    "##########\n"
-    "##      ##\n"
-    "##      ##\n"
-    "##      ##\n"
-    "##########\n"
-    "        ##\n"
-    "        ##\n"
-    "        ##\n"
+    "##########\0",
+    "##      ##\0",
+    "##      ##\0",
+    "##      ##\0",
+    "##########\0",
+    "        ##\0",
+    "        ##\0",
+    "        ##\0",
     "##########\0"
+
+};
+
+const char *colon[9] = {
+
+    " \0", //
+    "#\0", //
+    "#\0", //
+    " \0", //
+    " \0", //
+    " \0", //
+    "#\0", //
+    "#\0", //
+    " \0"  //
 
 };
 
@@ -189,8 +205,7 @@ void togglePauseTimer(t_timer *timer) {
   }
 
   timer->paused = 1;
-  timer->timeLeft =
-      timer->waitTimeSeconds - difftime(time(NULL), timer->initTime);
+  timer->timeLeft = timer->timeLeft - difftime(time(NULL), timer->initTime);
 }
 
 void nextSession() {
@@ -208,6 +223,8 @@ void nextSession() {
 
 void countTimer() {
   time_t now = time(NULL);
+  move(0, 0);
+  printw("timeLeft: \n%f", currentTimer->timeLeft);
 
   if (currentTimer->paused)
     return;
@@ -238,10 +255,19 @@ t_time decodeTime(const float secondsLeft) {
 
   minutes = (int)secondsLeft / 60;
   seconds = secondsLeft - minutes * 60;
-  printw("%d\n", minutes);
-  printw("%d\n", seconds);
 
   return (t_time){minutes, seconds};
+}
+
+void drawText(const char *text[], int sizeLines, int x, int y) {
+
+  for (int i = 0; i < sizeLines; i++) {
+    move(y, x);
+
+    printw("%s", text[i]);
+
+    y++;
+  }
 }
 
 void drawTimer() {
@@ -253,7 +279,7 @@ void drawTimer() {
                                difftime(time(NULL), currentTimer->initTime));
   }
 
-  // MINUTES
+  // MINUTES || FirstMinutes || SecondMinutes
   int Fmin = 0, Smin = 0;
   Fmin = timeLeftTimer.minutes / 10;
   Smin = timeLeftTimer.minutes - Fmin * 10;
@@ -262,12 +288,11 @@ void drawTimer() {
   Fsec = timeLeftTimer.seconds / 10;
   Ssec = timeLeftTimer.seconds - Fsec * 10;
 
-  move(LINES * 0.10, COLS * 0.);
-  printw("%s", NUMS[Smin]);
-  move(LINES * 0.45, COLS * 0.);
-  printw("%s", NUMS[Fsec]);
-  move(LINES * 0.75, COLS * 0.);
-  printw("%s", NUMS[Ssec]);
+  drawText(NUMS[Fmin], NUMS_LINES, COLS * 0.30, LINES * 0.25);
+  drawText(NUMS[Smin], NUMS_LINES, COLS * 0.40, LINES * 0.25);
+  drawText(NUMS[Fsec], NUMS_LINES, COLS * 0.54, LINES * 0.25);
+  drawText(NUMS[Ssec], NUMS_LINES, COLS * 0.64, LINES * 0.25);
+  drawText(colon, NUMS_LINES, COLS * 0.5, LINES * 0.25);
 }
 
 void drawCLI() { drawTimer(); };
@@ -278,7 +303,7 @@ int main(int argc, char *argv[]) {
   noecho();
   nodelay(stdscr, true);
 
-  timers[s_work] = createTimer(3 * 60);
+  timers[s_work] = createTimer(10 * 60);
   timers[s_break] = createTimer(2 * 60);
   timers[s_longbreak] = createTimer(1 * 60);
 
