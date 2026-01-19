@@ -1,5 +1,7 @@
 #include <curses.h>
+#include <stdarg.h>
 #include <stdlib.h>
+#include <string.h>
 #include <time.h>
 
 #define NUMS_LINES 9
@@ -152,13 +154,16 @@ const char *colon[9] = {
 
 };
 
+const char *loremIpsum = {"loremIpsum"};
+
 // Data structures
 enum pomodoroStates { s_work, s_break, s_longbreak };
+const char *stateNames[3] = {"WORK", "BREAK", "LONG BREAK"};
 
 struct pomodoroState {
   enum pomodoroStates state;
   enum pomodoroStates nextState;
-  _Bool countsAsWorkSession;
+  _Bool countsAsSession;
 } typedef p_state;
 
 struct timer {
@@ -176,7 +181,7 @@ struct time {
 // Global values
 _Bool EXIT = 0;
 p_state p_states[3] = {
-    {s_work, s_break, 1}, {s_break, s_work}, {s_longbreak, s_work}};
+    {s_work, s_break}, {s_break, s_work, 1}, {s_longbreak, s_work, 1}};
 enum pomodoroStates currentState = s_work;
 int sessionNumber = 0;
 
@@ -211,10 +216,11 @@ void togglePauseTimer(t_timer *timer) {
 
 void nextSession() {
   flash();
-  if (p_states[currentState].countsAsWorkSession)
+  if (p_states[currentState].countsAsSession)
     sessionNumber++;
 
-  if (sessionNumber % 4 == 0 && sessionNumber != 0)
+  if (sessionNumber % 4 == 0 && sessionNumber != 0 &&
+      currentState != s_longbreak)
     currentState = s_longbreak;
   else
     currentState = p_states[currentState].nextState;
@@ -269,6 +275,22 @@ void drawASCCI(const char *text[], int sizeLines, int x, int y) {
   }
 }
 
+void drawCenteredInCords(int x, int y, const char *text, ...) {
+  int textLengt = strlen(text);
+
+  int newx = x - (textLengt / 2);
+
+  move(y, newx);
+
+  va_list args;
+
+  va_start(args, text);
+
+  vw_printw(stdscr, text, args);
+
+  va_end(args);
+}
+
 void drawTimer() {
   t_time timeLeftTimer;
   if (currentTimer->paused) {
@@ -294,7 +316,13 @@ void drawTimer() {
   drawASCCI(colon, NUMS_LINES, COLS * 0.5, LINES * 0.25);
 }
 
-void drawCLI() { drawTimer(); };
+void drawCLI() {
+  drawTimer();
+  drawCenteredInCords(COLS * 0.5, LINES * 0.2, "%s  #%d",
+                      stateNames[currentState], sessionNumber);
+
+  drawCenteredInCords(COLS * 0.5, LINES - 5, "press P to pause");
+};
 
 int main(int argc, char *argv[]) {
   initscr();
