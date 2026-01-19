@@ -224,8 +224,6 @@ void nextSession() {
 
 void countTimer() {
   time_t now = time(NULL);
-  move(0, 0);
-  printw("timeLeft: \n%f", currentTimer->timeLeft);
 
   if (currentTimer->paused)
     return;
@@ -260,7 +258,7 @@ t_time decodeTime(const float secondsLeft) {
   return (t_time){minutes, seconds};
 }
 
-void drawText(const char *text[], int sizeLines, int x, int y) {
+void drawASCCI(const char *text[], int sizeLines, int x, int y) {
 
   for (int i = 0; i < sizeLines; i++) {
     move(y, x);
@@ -289,11 +287,11 @@ void drawTimer() {
   Fsec = timeLeftTimer.seconds / 10;
   Ssec = timeLeftTimer.seconds - Fsec * 10;
 
-  drawText(NUMS[Fmin], NUMS_LINES, COLS * 0.30, LINES * 0.25);
-  drawText(NUMS[Smin], NUMS_LINES, COLS * 0.40, LINES * 0.25);
-  drawText(NUMS[Fsec], NUMS_LINES, COLS * 0.54, LINES * 0.25);
-  drawText(NUMS[Ssec], NUMS_LINES, COLS * 0.64, LINES * 0.25);
-  drawText(colon, NUMS_LINES, COLS * 0.5, LINES * 0.25);
+  drawASCCI(NUMS[Fmin], NUMS_LINES, COLS * 0.30, LINES * 0.25);
+  drawASCCI(NUMS[Smin], NUMS_LINES, COLS * 0.40, LINES * 0.25);
+  drawASCCI(NUMS[Fsec], NUMS_LINES, COLS * 0.54, LINES * 0.25);
+  drawASCCI(NUMS[Ssec], NUMS_LINES, COLS * 0.64, LINES * 0.25);
+  drawASCCI(colon, NUMS_LINES, COLS * 0.5, LINES * 0.25);
 }
 
 void drawCLI() { drawTimer(); };
