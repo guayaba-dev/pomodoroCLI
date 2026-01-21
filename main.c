@@ -9,9 +9,12 @@
 
 #define NUMS_LINES 9
 
+#define NOTIF_TITLE "CPomodoro"
+
 // Versión correcta
 void sleep_ms(int ms) {
 #ifdef _WIN32
+
 #include <windows.h>
   Sleep(ms);
 #else
@@ -47,6 +50,26 @@ void play_sound(void) {
   }
 }
 #endif
+
+void sendNotif(const char *title, const char *message) {
+#ifdef _WIN32
+
+  MessageBoxA(NULL, message, title, MB_OK | MB_ICONINFORMATION);
+
+#elif __APPLE__
+  char comand[512];
+  snprintf(comand, sizeof(comand),
+           "osascript -e 'display notification \"%s\" with title \"%s\"'",
+           message, title);
+  system(comand);
+
+#else
+  char comand[512];
+  snprintf(comand, sizeof(comand), "notify-send \"%s\" \"%s\"", title, message);
+  system(comand);
+
+#endif
+}
 
 const char *NUMS[10][NUMS_LINES] = {
 
@@ -189,6 +212,9 @@ const char *loremIpsum = {"loremIpsum"};
 // Data structures
 enum pomodoroStates { s_work, s_break, s_longbreak };
 const char *stateNames[3] = {"WORK", "BREAK", "LONG BREAK"};
+const char *stateMessages[3] = // Messages displayed when a sessionEnded
+    {"WORK SESSSION ENDED, Take a break!!", "BREAK TIME IS OVER, Let's work",
+     "LONG BREAK is over, let's work"};
 
 struct pomodoroState {
   enum pomodoroStates state;
@@ -247,6 +273,7 @@ void togglePauseTimer(t_timer *timer) {
 void nextSession() {
   flash();
   play_sound();
+  sendNotif(NOTIF_TITLE, stateMessages[currentState]);
   if (p_states[currentState].countsAsSession)
     sessionNumber++;
 
