@@ -207,20 +207,25 @@ const char *colon[9] = {
 
 };
 
-const char *RESUME[5] = {
-    "###   \0", //
-    "##### \0", //
-    "######\0", //
-    "##### \0", //
-    "###   \0"  //
+const char *RESUME[7] = {
+    "#      \0", //
+    "###    \0", //
+    "#####  \0", //
+    "#######\0", //
+    "#####  \0", //
+    "###    \0", //
+    "#      \0"  //
 };
 
-const char *PAUSE[5] = {
+const char *PAUSE[7] = {
     "##  ##\0", //
     "##  ##\0", //
     "##  ##\0", //
     "##  ##\0", //
-    "##  ##\0"  //
+    "##  ##\0", //
+    "##  ##\0", //
+    "##  ##\0", //
+
 };
 
 const char *loremIpsum = {"loremIpsum"};
@@ -393,18 +398,18 @@ void drawTimer() {
 void drawPauseSimbols() {
 
   if (currentTimer->paused == 1) {
-    drawASCII(RESUME, 5, COLS * 0.5 - 2, LINES * .6);
+    drawASCII(RESUME, 7, COLS * 0.5 - 2, LINES * .6);
     return;
   }
 
-  drawASCII(PAUSE, 5, COLS * 0.5 - 2, LINES * .6);
+  drawASCII(PAUSE, 7, COLS * 0.5 - 2, LINES * .6);
 };
 
 void drawCLI() {
   drawTimer();
   drawPauseSimbols();
 
-  drawCenteredInCords(COLS * 0.5, LINES * 0.2, "%s  #%d",
+  drawCenteredInCords(COLS * 0.5, LINES * 0.2 - 1, "%s  #%d",
                       stateNames[currentState], sessionNumber);
 
   drawCenteredInCords(COLS * 0.5, LINES - 5, "press P to pause");
