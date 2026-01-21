@@ -207,6 +207,22 @@ const char *colon[9] = {
 
 };
 
+const char *RESUME[5] = {
+    "###   \0", //
+    "##### \0", //
+    "######\0", //
+    "##### \0", //
+    "###   \0"  //
+};
+
+const char *PAUSE[5] = {
+    "##  ##\0", //
+    "##  ##\0", //
+    "##  ##\0", //
+    "##  ##\0", //
+    "##  ##\0"  //
+};
+
 const char *loremIpsum = {"loremIpsum"};
 
 // Data structures
@@ -322,7 +338,7 @@ t_time decodeTime(const float secondsLeft) {
   return (t_time){minutes, seconds};
 }
 
-void drawASCCI(const char *text[], int sizeLines, int x, int y) {
+void drawASCII(const char *text[], int sizeLines, int x, int y) {
 
   for (int i = 0; i < sizeLines; i++) {
     move(y, x);
@@ -367,15 +383,27 @@ void drawTimer() {
   Fsec = timeLeftTimer.seconds / 10;
   Ssec = timeLeftTimer.seconds - Fsec * 10;
 
-  drawASCCI(NUMS[Fmin], NUMS_LINES, COLS * 0.30, LINES * 0.25);
-  drawASCCI(NUMS[Smin], NUMS_LINES, COLS * 0.40, LINES * 0.25);
-  drawASCCI(NUMS[Fsec], NUMS_LINES, COLS * 0.54, LINES * 0.25);
-  drawASCCI(NUMS[Ssec], NUMS_LINES, COLS * 0.64, LINES * 0.25);
-  drawASCCI(colon, NUMS_LINES, COLS * 0.5, LINES * 0.25);
+  drawASCII(NUMS[Fmin], NUMS_LINES, COLS * 0.30, LINES * 0.25);
+  drawASCII(NUMS[Smin], NUMS_LINES, COLS * 0.40, LINES * 0.25);
+  drawASCII(NUMS[Fsec], NUMS_LINES, COLS * 0.54, LINES * 0.25);
+  drawASCII(NUMS[Ssec], NUMS_LINES, COLS * 0.64, LINES * 0.25);
+  drawASCII(colon, NUMS_LINES, COLS * 0.5, LINES * 0.25);
 }
+
+void drawPauseSimbols() {
+
+  if (currentTimer->paused == 1) {
+    drawASCII(RESUME, 5, COLS * 0.5 - 2, LINES * .6);
+    return;
+  }
+
+  drawASCII(PAUSE, 5, COLS * 0.5 - 2, LINES * .6);
+};
 
 void drawCLI() {
   drawTimer();
+  drawPauseSimbols();
+
   drawCenteredInCords(COLS * 0.5, LINES * 0.2, "%s  #%d",
                       stateNames[currentState], sessionNumber);
 
