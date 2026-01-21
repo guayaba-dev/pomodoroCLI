@@ -1,8 +1,11 @@
 #include <curses.h>
 #include <stdarg.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+
+#include "timerOutSound.h"
 
 #define NUMS_LINES 9
 
@@ -17,6 +20,33 @@ void sleep_ms(int ms) {
   usleep(ms * 1000);
 #endif
 }
+
+#ifdef _WIN32
+#include <windows.h>
+void play_sound(void) {
+  PlaySound((LPCSTR)timerOut_wav, NULL, SND_MEMORY | SND_ASYNC);
+}
+#else
+void play_sound(void) {
+  // Guardar temporalmente y reproducir
+  FILE *tmp = tmpfile();
+  if (tmp) {
+    fwrite(timerOut_wav, 1, timerOut_wav_len, tmp);
+    fflush(tmp);
+
+#ifdef __APPLE__
+    char cmd[256];
+    sprintf(cmd, "afplay /dev/fd/%d 2>/dev/null &", fileno(tmp));
+#else
+    char cmd[256];
+    sprintf(cmd, "aplay -q /dev/fd/%d 2>/dev/null &", fileno(tmp));
+#endif
+
+    system(cmd);
+    // No cerrar tmp - se cerrará al salir del programa
+  }
+}
+#endif
 
 const char *NUMS[10][NUMS_LINES] = {
 
@@ -216,6 +246,7 @@ void togglePauseTimer(t_timer *timer) {
 
 void nextSession() {
   flash();
+  play_sound();
   if (p_states[currentState].countsAsSession)
     sessionNumber++;
 
