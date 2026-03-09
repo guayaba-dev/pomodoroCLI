@@ -1,3 +1,5 @@
+#include "config.c"
+
 #include <curses.h>
 #include <stdarg.h>
 #include <stdio.h>
@@ -416,14 +418,18 @@ void drawCLI() {
 };
 
 int main(int argc, char *argv[]) {
+
+  if (argc > 2)
+    loadConfig(argc, argv);
+
   initscr();
   cbreak();
   noecho();
   nodelay(stdscr, true);
 
-  timers[s_work] = createTimer(10);
-  timers[s_break] = createTimer(2);
-  timers[s_longbreak] = createTimer(1);
+  timers[s_work] = createTimer(config.work_duration * 60);
+  timers[s_break] = createTimer(config.break_duration * 60);
+  timers[s_longbreak] = createTimer(config.longBreak_duration * 60);
 
   setTimer(timers[s_work]);
 

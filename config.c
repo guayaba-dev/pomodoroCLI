@@ -1,21 +1,45 @@
-#include <stdio.h>
-enum configNames { WORK_TIME, BREAK_TIME, LONG_BREAKTIME, NOTIF, SOUND };
+#ifndef __POMODORO_CONFIG__
+#define __POMODORO_CONFIG__
 
-int config[5] = {0, 0, 0, 0, 0};
+#include <stdbool.h>
+#define _true 1
+#define _false 1
 
-const char *configKeys[5] = {"WORK_TIME", "BREAK_TIME", "LONG_BREAKTIME",
-                             "NOTIF", "SOUND"};
+struct option {
+  int needsArgument;
+  int argc;
+  char shortName;
+  char nameParam[25];
+};
 
-void loadFile(const char *dir) {
-  FILE *file = fopen(dir, "r");
+struct option long_options[] = {{_true, 1, 'w', "work"},
+                                {_true, 1, 'b', "break"},
+                                {_true, 1, 'l', "longBreak"},
+                                {_true, 1, 'r', "rounds"},
+                                {_true, 1, 'c', "config"},
+                                {_true, 1, 's', "sound"},
+                                {_false, 0, 'h', "help"},
+                                {_false, 0, 'v', "version"}
 
-  if (file == NULL)
-    return;
+};
 
-  char data[50];
+typedef struct {
+  int work_duration;
+  int break_duration;
+  int longBreak_duration;
+  int roundsTillLongBreak;
+} PomodoroConfig;
 
-  while (fgets(data, 50, file) != NULL) {
+PomodoroConfig config = {.work_duration = 30,
+                         .break_duration = 10,
+                         .longBreak_duration = 15,
+                         .roundsTillLongBreak = 4};
 
-    // HASHMAP get config name
-  }
+void loadConfig(int argc, char *argv[]) {
+
+  typedef struct {
+
+  } configParser;
 }
+
+#endif /* ifndef __POMODORO_CONFIG */
