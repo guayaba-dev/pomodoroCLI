@@ -300,8 +300,8 @@ void nextSession() {
   if (p_states[currentState].countsAsSession)
     sessionNumber++;
 
-  if (sessionNumber % 4 == 0 && sessionNumber != 0 &&
-      currentState != s_longbreak)
+  if (sessionNumber % config.roundsTillLongBreak == 0 && sessionNumber != 0 &&
+      (currentState != s_longbreak))
     currentState = s_longbreak;
   else
     currentState = p_states[currentState].nextState;
@@ -334,6 +334,9 @@ void getInput() {
 
   if (tecla == 112 || tecla == 80)
     togglePauseTimer(currentTimer);
+
+  if (tecla == 110 || tecla == 78)
+    nextSession();
 };
 
 t_time decodeTime(const float secondsLeft) {
@@ -421,6 +424,10 @@ int main(int argc, char *argv[]) {
 
   if (argc > 2)
     loadConfig(argc, argv);
+
+  char srvar[100];
+
+  fgets(srvar, 100, stdin);
 
   initscr();
   cbreak();

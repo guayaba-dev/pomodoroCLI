@@ -1,27 +1,11 @@
 #ifndef __POMODORO_CONFIG__
 #define __POMODORO_CONFIG__
 
+#include <getopt.h>
 #include <stdbool.h>
+#include <stdlib.h>
 #define _true 1
-#define _false 1
-
-struct option {
-  int needsArgument;
-  int argc;
-  char shortName;
-  char nameParam[25];
-};
-
-struct option long_options[] = {{_true, 1, 'w', "work"},
-                                {_true, 1, 'b', "break"},
-                                {_true, 1, 'l', "longBreak"},
-                                {_true, 1, 'r', "rounds"},
-                                {_true, 1, 'c', "config"},
-                                {_true, 1, 's', "sound"},
-                                {_false, 0, 'h', "help"},
-                                {_false, 0, 'v', "version"}
-
-};
+#define _false 0
 
 typedef struct {
   int work_duration;
@@ -37,9 +21,29 @@ PomodoroConfig config = {.work_duration = 30,
 
 void loadConfig(int argc, char *argv[]) {
 
-  typedef struct {
+  int opt;
 
-  } configParser;
+  while ((opt = getopt(argc, argv, "w:b:l:r:")) != -1) {
+
+    switch (opt) {
+
+    case 'w':
+      config.work_duration = atoi(optarg);
+      break;
+
+    case 'b':
+      config.break_duration = atoi(optarg);
+      break;
+
+    case 'l':
+      config.longBreak_duration = atoi(optarg);
+      break;
+
+    case 'r':
+      config.roundsTillLongBreak = atoi(optarg);
+      break;
+    }
+  }
 }
 
 #endif /* ifndef __POMODORO_CONFIG */
